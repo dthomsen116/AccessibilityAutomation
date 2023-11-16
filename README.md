@@ -27,9 +27,9 @@ This capstone mission is rooted in my commitment to revolutionizing accessibilit
 ## Links
 
 - [Wiki](https://github.com/dthomsen116/AccessibilityAutomation/wiki)
-- [Project Board]()
-- [Mind Map]()
-- [Design Project 2]()
+- [Project Board](https://github.com/users/dthomsen116/projects/5/views/1)
+- [Mind Map](https://github.com/dthomsen116/AccessibilityAutomation/blob/main/MindMap.pdf)
+- [Design Project 2](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Design-Project-2)
 
 
 
