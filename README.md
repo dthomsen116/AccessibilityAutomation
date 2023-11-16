@@ -37,7 +37,7 @@ This capstone mission is rooted in my commitment to revolutionizing accessibilit
 
 Need to get in touch with us? Here's how:
 
-- Email: dthom.cap24@gmail.com
+- Email: david.thomsen@mymail.champlain.edu
 - Linkedin: https://www.linkedin.com/in/thomsendavid/
 
 ---
