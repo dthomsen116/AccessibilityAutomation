@@ -4,9 +4,10 @@ import urllib3
 urllib3.disable_warnings()
 
 class ProxmoxManager:
-    def __init__(self, host, creds_filename):
+    def __init__(self, creds_filename):
         # Initialize the class with credentials and ProxmoxAPI instance
         self.creds = self.readCreds(creds_filename)
+        host = self.creds['host']
         self.proxmox = ProxmoxAPI(host, user=self.creds.get('user'), password=self.creds.get('passwd'), verify_ssl=False)
 
     def readCreds(self, filename):
@@ -66,7 +67,5 @@ class ProxmoxManager:
 
 if __name__ == "__main__":
     creds_filename = 'AutoAcc\creds.txt'
-    host = "192.168.0.160:8006"
-    
-    manager = ProxmoxManager(host, creds_filename)
+    manager = ProxmoxManager(creds_filename)
     manager.mainMenu()
