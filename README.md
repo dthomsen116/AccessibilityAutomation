@@ -40,7 +40,7 @@ My goal with this project is to create an application that can be utilized durin
 | Sprint | Link |
 | --- | --- |
 | SYS-480 Automation Skills | (https://github.com/dthomsen116/SYS-480)| 
-|Sources Used Document|()|
+|Sources Used Document|(https://github.com/dthomsen116/AccessibilityAutomation/blob/main/Other/Sources.md)|
 
 ## Contact me
 
