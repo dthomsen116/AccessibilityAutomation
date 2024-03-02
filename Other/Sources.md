@@ -15,4 +15,5 @@
 |Digital Accessibility Tools|https://www.g2.com/categories/digital-accessibility-tools| A list of some modern accessibility tools|[D.A. Tools](https://github.com/dthomsen116/Capstone23-24/wiki/Digital-Accessibility-Tools)|
 |ChatGPT | https://chat.openai.com/ | A helpful assistant for random questions throughout the project | [OpenAI](https://openai.com/) |
 |Microsoft Copilot | https://copilot.microsoft.com/ | ^^ | [Copilot](https://www.microsoft.com/en-us/microsoft-copilot)|
-|
+| Google API and CSV Files | https://jamesachambers.com/modify-google-sheets-using-powershell/ | Google Forms creates a table with outputs and this can be managed via API | [Google Drive API Overview](https://developers.google.com/drive/api/guides/about-sdk)| 
+| Windows Settings Syntax | https://pureinfotech.com/windows-11-mssettings-uri-commands/ | Gives a full list of commands that can be modified through powershell| [ms-settings: URI scheme reference](https://learn.microsoft.com/en-us/windows/uwp/launch-resume/launch-settings-app#ms-settings-uri-scheme-reference) |

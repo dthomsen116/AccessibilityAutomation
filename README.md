@@ -33,7 +33,7 @@ My goal with this project is to create an application that can be utilized durin
 |Automation Accessibility Wiki | [Wiki Link](https://github.com/dthomsen116/AccessibilityAutomation/wiki) |
 | Project Board | [Project Board Link](https://github.com/users/dthomsen116/projects/5/views/1)|
 | Mind Map | [Mind Map Link](https://github.com/dthomsen116/AccessibilityAutomation/blob/main/MindMap.pdf)|
-|Network Assignments | [Network Assignments Link]
+|Network Assignments | [Network Assignments Link](https://github.com/dthomsen116/AccessibilityAutomation/blob/main/Other/Assignment%20tracker.xlsx)
 
 ## Sources
 
