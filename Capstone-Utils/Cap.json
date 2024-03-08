@@ -1,0 +1,6 @@
+{
+    "vcenter_server": "vcenter.capstone.local",
+    "vm_folder": "BaseVMS",
+    "esxi_host": "192.168.7.24",
+    "default_network" : "CAP-WAN"
+}
