@@ -17,21 +17,19 @@ responses = sheet.get_all_records()
 
 # Loop through each response and create a cleaned CSV file
 for response in responses:
-    timestamp = response['Timestamp']
+    print(response)
     fn = response['First Name'].lower()
     ln = response['Last Name'].lower()
-    textsize = response['How large would you like the text scaling?']
-    cursor = response['How large would you like the Mouse Cursor?']
-    narrator = response['Would you like to turn on Narrator?']
-    magnifier = response['Would you like to turn on Magnifier?']
-    voice = response['Would you like to turn on Voice Access?']
-    keyboard = response['Would you like to turn on an On Screen Keyboard?']
-    languages = '(' + response['Select all additional languages for keyboard loadout'] + ')'
-
-    eyecontrol = response['Would you like to turn on Eye Control?']
+    narrator = response['Would you like to Enable Narrator?']
+    magnifier = response['Would you like to Enable Magnifier?']
+    cortana = response['Would you like to enable Cortana?']
+    osk = response['Would you like to enable the On Screen Keyboard?']
+    sk = response['Would you like to enable Sticky Keys?']
+    alert = response['Would you like to show audio alerts visually?']
+    languages = '{' + response['Select all additional languages for keyboard loadout'] + '}'
 
     # Create a list with cleaned data
-    cleaned_data = [fn, ln, textsize, cursor, narrator, magnifier, voice, keyboard, languages, eyecontrol]
+    cleaned_data = [fn, ln, narrator, magnifier, cortana, osk, sk, alert, languages]
 
     # Create a filename
     filename = f"AccessibilityAutomation/Capstone-Utils/CSVs/{fn}_{ln}.csv"
