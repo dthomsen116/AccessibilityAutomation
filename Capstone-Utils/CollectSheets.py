@@ -32,7 +32,7 @@ for response in responses:
     cleaned_data = [fn, ln, narrator, magnifier, cortana, osk, sk, alert, languages]
 
     # Create a filename
-    filename = f"AccessibilityAutomation/Capstone-Utils/CSVs/{fn}_{ln}.csv"
+    filename = f"AccessibilityAutomation/Capstone-Utils/CSVs/{fn}-{ln}.csv"
 
     # Check if the file already exists
     if os.path.exists(filename):

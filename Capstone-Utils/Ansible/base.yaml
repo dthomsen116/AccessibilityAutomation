@@ -1,0 +1,15 @@
+---
+- name: Configure Windows VM
+  hosts: testfn_testln
+  gather_facts: no
+  tasks:
+    - name: Change hostname
+      ansible.windows.win_hostname:
+        name: "{{ hostname }}"
+    
+    - name: Configure network settings
+      ansible.windows.win_network_adapter:
+        name: "CAP-WAN"  # Adjust this if needed, depending on the network adapter name
+        ipv4_address: "{{ ip }}"  
+        ipv4_gateway: "{{ gateway }}"
+        dns_servers: "{{ name_server }}"
