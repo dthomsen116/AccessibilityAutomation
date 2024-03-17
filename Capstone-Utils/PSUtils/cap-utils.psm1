@@ -136,13 +136,6 @@ $ip $confip $hostname $dns $gateway
     }
 }
 
-function ChangeHostname(){
-    $vm = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
-    $hostname = $vm.Name + "-WorkEnv"
-    Invoke-VMScript -ScriptText "Rename-Computer -NewName $hostname -Force -Restart" -VM $vm -GuestCredential (Get-Credential)
-    }
-
-
 function VmStatus([String] $vm){
     $guest = Get-VMGuest -VM $vm
     $network = Get-NetworkAdapter -VM $vm
@@ -162,4 +155,18 @@ function VmStatus([String] $vm){
         Write-Host -ForegroundColor DarkCyan "Subnet: $subnet"
         $i=$i+2
     }
+}
+
+function ChangeHostname(){
+    $vm = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
+    $hostname = $vm.Name + "-WorkEnv"
+    Invoke-VMScript -ScriptText "Rename-Computer -NewName $hostname -Force -Restart" -VM $vm -GuestCredential (Get-Credential)
+    }
+
+function DNSRecord(){
+    $vm = Get-VM -Name 'David-AD'
+    $zoneName = "capstone.local"
+    $recordName = $vm.guest.Hostname + "WorkEnv"
+    $ip = $vm.guest.IPAddress[0]
+    Invoke-VMScript -ScriptText "Add-DnsServerResourceRecordA -Name $recordName -ZoneName $zonename -AllowUpdateAny -IPv4Address $ip" -VM $vm -GuestCredential (Get-Credential) 
 }
