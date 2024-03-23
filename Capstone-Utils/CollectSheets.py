@@ -17,7 +17,7 @@ responses = sheet.get_all_records()
 
 # Loop through each response and create a cleaned CSV file
 for response in responses:
-    print(response)
+    #print(response)
     fn = response['First Name'].lower()
     ln = response['Last Name'].lower()
     narrator = response['Would you like to Enable Narrator?']

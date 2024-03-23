@@ -80,7 +80,7 @@ function CreateClone([string] $csv_path) {
     }
     try {
         $newName = $csv[0] + '-' + $csv[1]
-        New-VM -Name $newname -VM 'Win10Temp' -Datastore 'datastore1' -VMHost "192.168.7.24" -Location 'WorkEnv' -LinkedClone -ReferenceSnapshot '(Base(DJ(Login)))'
+        New-VM -Name $newname -VM 'Win10Temp' -Datastore 'datastore2' -VMHost "192.168.7.24" -Location 'WorkEnv' -LinkedClone -ReferenceSnapshot '(Base(DJ(Login)))'
         Write-Host -ForegroundColor Green "Full Clone created: $clone_name"
     }
     catch {
@@ -156,11 +156,15 @@ function VmStatus([String] $vm){
         $i=$i+2
     }
 }
-
+function JoinDomain(){
+    $vm = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
+    $hostname = $vm.Name + "-WorkEnv"
+    Invoke-VMScript -ScriptType Powershell -ScriptText "Add-Computer -DomainName capstone.local -Restart" -VM $vm -GuestCredential (Get-Credential)
+    }
 function ChangeHostname(){
     $vm = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
     $hostname = $vm.Name + "-WorkEnv"
-    Invoke-VMScript -ScriptText "Rename-Computer -NewName $hostname -Force -Restart" -VM $vm -GuestCredential (Get-Credential)
+    Invoke-VMScript -ScriptType Powershell -Verbose -ScriptText "Rename-Computer -NewName $hostname -Force -Restart" -VM $vm -GuestCredential (Get-Credential)
     }
 
 function DNSRecord(){
