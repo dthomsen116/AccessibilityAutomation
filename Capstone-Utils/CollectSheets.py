@@ -22,14 +22,14 @@ for response in responses:
     ln = response['Last Name'].lower()
     narrator = response['Would you like to Enable Narrator?']
     magnifier = response['Would you like to Enable Magnifier?']
-    cortana = response['Would you like to enable Cortana?']
+    larger = response['Would you like to enable Larger Text?']
     osk = response['Would you like to enable the On Screen Keyboard?']
     sk = response['Would you like to enable Sticky Keys?']
     alert = response['Would you like to show audio alerts visually?']
-    languages = '{' + response['Select all additional languages for keyboard loadout'] + '}'
+    languages = response['Select all additional languages for keyboard loadout']
 
     # Create a list with cleaned data
-    cleaned_data = [fn, ln, narrator, magnifier, cortana, osk, sk, alert, languages]
+    cleaned_data = [fn, ln, narrator, magnifier, larger, osk, sk, alert, languages]
 
     # Create a filename
     filename = f"AccessibilityAutomation/Capstone-Utils/CSVs/{fn}-{ln}.csv"
@@ -42,3 +42,5 @@ for response in responses:
         with open(filename, 'w') as f:
             f.write(','.join(map(str, cleaned_data)))
         print(f"File '{filename}' created successfully.")
+
+ 

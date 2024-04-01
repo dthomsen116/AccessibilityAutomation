@@ -174,3 +174,95 @@ function DNSRecord(){
     $ip = $vm.guest.IPAddress[0]
     Invoke-VMScript -ScriptText "Add-DnsServerResourceRecordA -Name $recordName -ZoneName $zonename -AllowUpdateAny -IPv4Address $ip" -VM $vm -GuestCredential (Get-Credential) 
 }
+function CreateScript([string] $csv_path) {
+    $newVM = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
+    $filename = $newVM.Name 
+    $path = "AccessibilityAutomation/Capstone-Utils/CSVs/$filename.csv"
+    $file = Get-Content -Path $csv_path
+    $powershellScript = @()
+    foreach($item in $file) {
+        $individuals = $item -split ',' | ForEach-Object {
+            $_.Trim()
+        }
+        $narrator = $individuals[2]
+        $magnifier = $individuals[3]
+        $larger = $individuals[4]
+        $osk = $individuals[5]
+        $stickykeys = $individuals[6]
+        $visualalerts = $individuals[7]
+        $en = $individuals[8]
+        $sp = $individuals[9]
+        $fr = $individuals[10]
+        $ge = $individuals[11]
+        $chS = $individuals[12]
+        $chT = $individuals[13]
+        $ja = $individuals[14]
+        $ko = $individuals[15]
+        $ru = $individuals[16]
+        $comment = $individuals[17]
+
+        try {
+            if ($narrator -eq "yes") {
+                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Narrator\NoRoam" -Name "WinEnterLaunchEnabled" -Value 1 -PropertyType DWORD -Force'
+            }
+            if ($magnifier -eq "yes") {
+                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Accessibility" -Name "Magnifier" -Value 1 -PropertyType DWORD -Force'
+            }
+            if ($larger -eq "yes") {
+                $powershellScript += 'Set-ItemProperty -Path "HKCU:\Control Panel\Desktop"  -Name "LogPixels" -Value 150'
+                $powershellScript += 'Set-ItemProperty -Path "HKCU:\Control Panel\Desktop"  -Name "DpiScalingVer" -Value 1'
+                $powershellScript += 'Set-ItemProperty -Path "HKCU:\Control Panel\Desktop"  -Name "Win8DpiScaling" -Value 0'
+            }
+            if ($osk -eq "yes") {
+                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer" -Name "EnableAutoTray" -Value 1 -PropertyType DWORD -Force'
+            }
+            if ($stickykeys -eq "yes") {
+                $powershellScript += 'New-ItemProperty -Path "HKCU:\Control Panel\Accessibility\StickyKeys" -Name "Flags" -Value 506 -PropertyType DWORD -Force'
+            }
+            if ($visualalerts -eq "yes") {
+                $powershellScript += 'Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\SystemNotification\.Current" -Name "(Default)" -Value "C:\WINDOWS\Media\Windows Notify System Generic.wav"'
+            }
+            # Create an array to store language tags
+            $languages = @()
+
+            # Check each language variable and add its language tag to the $languages array
+            if ($en -eq 'English') { $languages += "en-US" }
+            if ($sp -eq 'Spanish') { $languages += "es-ES" }
+            if ($fr -eq 'French') { $languages += "fr-FR" }
+            if ($ge -eq 'German') { $languages += "de-DE" }
+            if ($chS -eq 'Chinese (Simplified)') { $languages += "zh-CN" }
+            if ($chT -eq 'Chinese (Traditional)') { $languages += "zh-TW" }
+            if ($ja -eq 'Japanese') { $languages += "ja-JP" }
+            if ($ko -eq 'Korean') { $languages += "ko-KR" }
+            if ($ru -eq 'Russian') { $languages += "ru-RU" }
+
+            $powershellScript += '$languages = @()'
+            foreach( $language in $languages) {
+                $powershellScript += '$languages += "' + $language + '"'
+            }
+
+            # Apply the new keyboard layout based on the selected languages
+            $powershellScript += 'Set-WinUserLanguageList -LanguageList $languages -Force'
+            
+            try {
+                $scriptPath = "AccessibilityAutomation/Capstone-Utils/Scripts/$filename-conf.ps1"
+                # Check if the file already exists
+                if (Test-Path $scriptPath) {
+                    Write-Host -ForegroundColor Red "File already exists at $scriptPath"
+                    Write-Host "Continuing..."
+                    $powershellScript | Out-File -FilePath $scriptPath
+                    Write-host -ForegroundColor Green "Script created at $scriptPath"
+                } else {
+                    New-Item -Path $scriptPath -ItemType File
+                    $powershellScript | Out-File -FilePath $scriptPath
+                }
+            } catch {
+                Write-Host -ForegroundColor Red "Error creating script"
+                Write-Host $_.Exception.Message
+            }
+        } catch {
+            Write-Host -ForegroundColor Red "Error creating script"
+            Write-Host $_.Exception.Message
+        }
+    }
+}
