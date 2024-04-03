@@ -80,7 +80,7 @@ function CreateClone([string] $csv_path) {
     }
     try {
         $newName = $csv[0] + '-' + $csv[1]
-        New-VM -Name $newname -VM 'Win10Temp' -Datastore 'datastore2' -VMHost "192.168.7.24" -Location 'WorkEnv' -LinkedClone -ReferenceSnapshot '(Base(DJ(Login)))'
+        New-VM -Name $newname -VM 'Win10Base' -Datastore 'datastore2' -VMHost "192.168.7.24" -Location 'WorkEnv' -LinkedClone -ReferenceSnapshot 'Base'
         Write-Host -ForegroundColor Green "Full Clone created: $clone_name"
     }
     catch {
@@ -203,8 +203,13 @@ function CreateScript([string] $csv_path) {
 
         try {
             if ($narrator -eq "yes") {
-                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Narrator\NoRoam" -Name "WinEnterLaunchEnabled" -Value 1 -PropertyType DWORD -Force'
+                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Narrator" -Name "NarratorCursorHighlight" -Value 1 -PropertyType DWORD -Force;'
+                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Narrator" -Name "FollowInsertion" -Value 1 -PropertyType DWORD -Force;'
+                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Narrator" -Name "CoupleNarratorCursorKeyboard" -Value 1 -PropertyType DWORD -Force;'
+                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Narrator" -Name "InteractionMouse" -Value 1 -PropertyType DWORD -Force;'
+                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Narrator" -Name "CoupleNarratorCursorMouse" -Value 1 -PropertyType DWORD -Force;'
             }
+            
             if ($magnifier -eq "yes") {
                 $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Accessibility" -Name "Magnifier" -Value 1 -PropertyType DWORD -Force'
             }
@@ -265,4 +270,23 @@ function CreateScript([string] $csv_path) {
             Write-Host $_.Exception.Message
         }
     }
+}
+
+
+function SelectCsv(){
+    $files = Get-ChildItem '/home/david/Documents/AccessibilityAutomation/Capstone-Utils/CSVs'
+
+    for ($i = 0; $i -lt $files.Count; $i++) {
+        Write-Host "$($i + 1). $($files[$i].Name)"
+    }
+
+    $selectedIndex = Read-Host "Enter the index of the file you want to select"
+
+    if ($selectedIndex -ge 1 -and $selectedIndex -le $files.Count) {
+        $selectedFile = $files[$selectedIndex - 1]
+        Write-Host "You have selected: $($selectedFile.FullName)"
+        return $selectedFile.FullName
+    } else {
+        Write-Host "Invalid selection. Please enter a valid index."
+}
 }
