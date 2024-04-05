@@ -179,7 +179,7 @@ function CreateScript([string] $csv_path) {
     $filename = $newVM.Name 
     $path = "AccessibilityAutomation/Capstone-Utils/CSVs/$filename.csv"
     $file = Get-Content -Path $csv_path
-    $powershellScript = @()
+    $regScript = @()
     foreach($item in $file) {
         $individuals = $item -split ',' | ForEach-Object {
             $_.Trim()
@@ -202,30 +202,47 @@ function CreateScript([string] $csv_path) {
         $comment = $individuals[17]
 
         try {
+                $regScript += "Windows Registry Editor Version 5.00"
+                $regScript += ""
+                $regScript += "[HKEY_CURRENT_USER\Control Panel\Accessibility\On]"
+                $regScript += '"On"="1"'
+                $regScript += ""
             if ($narrator -eq "yes") {
-                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Narrator" -Name "NarratorCursorHighlight" -Value 1 -PropertyType DWORD -Force;'
-                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Narrator" -Name "FollowInsertion" -Value 1 -PropertyType DWORD -Force;'
-                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Narrator" -Name "CoupleNarratorCursorKeyboard" -Value 1 -PropertyType DWORD -Force;'
-                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Narrator" -Name "InteractionMouse" -Value 1 -PropertyType DWORD -Force;'
-                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Narrator" -Name "CoupleNarratorCursorMouse" -Value 1 -PropertyType DWORD -Force;'
+                $regScript += '[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Accessibility]'
+                $regScript += '"Configuration"="Narrator"'
+                $regScript += ""
             }
             
             if ($magnifier -eq "yes") {
-                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Accessibility" -Name "Magnifier" -Value 1 -PropertyType DWORD -Force'
+                $regScript += '[HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\Accessibility]'
+                $regScript += '"Configuration"="Magnifier"'
+                $regScript += ""
             }
             if ($larger -eq "yes") {
-                $powershellScript += 'Set-ItemProperty -Path "HKCU:\Control Panel\Desktop"  -Name "LogPixels" -Value 150'
-                $powershellScript += 'Set-ItemProperty -Path "HKCU:\Control Panel\Desktop"  -Name "DpiScalingVer" -Value 1'
-                $powershellScript += 'Set-ItemProperty -Path "HKCU:\Control Panel\Desktop"  -Name "Win8DpiScaling" -Value 0'
+                #tenforums.com/tutorials/5990-change-text-size-windows-10-a.html
+                $regScript += "[HKEY_CURRENT_CONFIG\Software\Fonts]"
+                $regScript += '"LogPixels"=dword:00000144'
+                $regScript += ""
+                $regScript += "[HKEY_CURRENT_USER\Control Panel\Desktop]"
+                $regScript += '"Win8DpiScaling"=dword:1'
+                $regScript += ""
+
             }
             if ($osk -eq "yes") {
-                $powershellScript += 'New-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer" -Name "EnableAutoTray" -Value 1 -PropertyType DWORD -Force'
+                $regScript += '[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Authentication\LogonUI]'
+                $regScript += '"ShowTabletKeyboard"=dword:1'
             }
             if ($stickykeys -eq "yes") {
-                $powershellScript += 'New-ItemProperty -Path "HKCU:\Control Panel\Accessibility\StickyKeys" -Name "Flags" -Value 506 -PropertyType DWORD -Force'
+                $regScript += '[HKEY_CURRENT_USER\Control Panel\Accessibility\StickyKeys]'
+                $regScript += '"Flags"="506"'
+                $regScript += ""
+                $regScript += '[HKEY_CURRENT_USER\Control Panel\Accessibility\Keyboard Response]'
+                $regScript += '"Flags"="122"'
             }
             if ($visualalerts -eq "yes") {
-                $powershellScript += 'Set-ItemProperty -Path "HKCU:\AppEvents\Schemes\Apps\.Default\SystemNotification\.Current" -Name "(Default)" -Value "C:\WINDOWS\Media\Windows Notify System Generic.wav"'
+                $regScript += '[HKEY_CURRENT_USER\Control Panel\Accessibility\ShowSounds]'
+                $regScript += '"On"="1"'
+                $regScript += ""
             }
             # Create an array to store language tags
             $languages = @()
@@ -241,25 +258,23 @@ function CreateScript([string] $csv_path) {
             if ($ko -eq 'Korean') { $languages += "ko-KR" }
             if ($ru -eq 'Russian') { $languages += "ru-RU" }
 
-            $powershellScript += '$languages = @()'
-            foreach( $language in $languages) {
-                $powershellScript += '$languages += "' + $language + '"'
-            }
-
-            # Apply the new keyboard layout based on the selected languages
-            $powershellScript += 'Set-WinUserLanguageList -LanguageList $languages -Force'
-            
+            # Add language settings to the .reg script
+            foreach ($language in $languages) {
+                $regScript += "[HKEY_CURRENT_USER\Keyboard Layout\Preload]"
+                $regScript += "`"`"1`"`"=`"$language`""
+                $regScript += ""
+                }            
             try {
-                $scriptPath = "AccessibilityAutomation/Capstone-Utils/Scripts/$filename-conf.ps1"
+                $scriptPath = "AccessibilityAutomation/Capstone-Utils/Scripts/$filename-conf.reg"
                 # Check if the file already exists
                 if (Test-Path $scriptPath) {
                     Write-Host -ForegroundColor Red "File already exists at $scriptPath"
                     Write-Host "Continuing..."
-                    $powershellScript | Out-File -FilePath $scriptPath
+                    $regScript | Out-File -FilePath $scriptPath
                     Write-host -ForegroundColor Green "Script created at $scriptPath"
                 } else {
                     New-Item -Path $scriptPath -ItemType File
-                    $powershellScript | Out-File -FilePath $scriptPath
+                    $regScript | Out-File -FilePath $scriptPath
                 }
             } catch {
                 Write-Host -ForegroundColor Red "Error creating script"

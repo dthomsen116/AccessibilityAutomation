@@ -1,3 +1,64 @@
-windows:
-  hosts:
-  children:
+---
+- name: Custom Windows Configuration
+  vars_prompt:
+    - name: admin_password
+      prompt: "Enter admin password for {{ ansible_user }}:"
+      private: yes
+    - name: domain_password
+      prompt: "Enter domain admin password:"
+      private: yes
+  tasks:
+    - name: Change hostname
+      win_hostname:
+        name: "{{ new_hostname }}"
+      vars:
+        new_hostname: "new_hostname_here"
+      become: yes
+      become_method: runas
+      become_user: Administrator
+      become_password: "{{ admin_password }}"
+    
+    - name: Create user
+      win_user:
+        name: "{{ username }}"
+        password: "{{ temp_password }}"
+        state: present
+      vars:
+        username: "new_user"
+        temp_password: "temp_password_here"
+      become: yes
+      become_method: runas
+      become_user: Administrator
+      become_password: "{{ admin_password }}"
+    
+    - name: Add host to domain
+      win_domain_membership:
+        hostname: "{{ inventory_hostname }}"
+        domain_name: "{{ domain_name }}"
+        username: "{{ domain_username }}"
+        password: "{{ domain_password }}"
+        ou_path: "{{ ou_path }}"
+      vars:
+        domain_name: "example.com"
+        domain_username: "domain_admin"
+        ou_path: "OU=Computers,OU=MyBusiness,DC=example,DC=com"
+      become: yes
+      become_method: runas
+      become_user: Administrator
+      become_password: "{{ admin_password }}"
+    
+    - name: Run script
+      win_shell: "C:\\path\\to\\script.ps1"
+      become: yes
+      become_method: runas
+      become_user: Administrator
+      become_password: "{{ admin_password }}"
+      
+    - name: Reboot
+      win_reboot:
+        reboot_timeout: 300
+        msg: "Rebooting to apply changes"
+      become: yes
+      become_method: runas
+      become_user: Administrator
+      become_password: "{{ admin_password }}"
