@@ -26,63 +26,26 @@ try{
 }
 
 # Select the CSV to be used for additional configuration
-try{
-    write-host "Selecting CSV..."
-    $csv = SelectCsv
-} catch{
-    write-host -ForegroundColor Red "Error: $_"
-}
-
 # Create the Configuration
-try{
-    write-host "Creating Script..."
-    CreateScript -csv_path $csv
-} catch{
-    write-host -ForegroundColor Red "Error: $_"
-}
+write-host "Selecting CSV..."
+$csv = SelectCsv
 
-# Create the clone
+
+# debug 
+write-host "CSV: $csv"
+
+#create clone 
 try{
     write-host "Creating Clone..."
-    CreateClone -csv_path $csv
-    $timer = 10
-    while ($timer -gt 0) {
-        write-host "Waiting for clone to be created... Time remaining: $timer seconds"
-        Start-Sleep -Seconds 1
-        $timer--
-    }
-} catch{
+    createClone -csv_path $csv
+    sleep 5
+}
+catch{
     write-host -ForegroundColor Red "Error: $_"
 }
 
-# Turn on the new clone
-try{
-    write-host "Turning on the new clone..."
-    turnonNewClone
-    
-    write-host "checking powerstate"
-    do{
-        $vm = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
-        Start-Sleep -Seconds 5
-    } until ($vm.PowerState -eq "PoweredOn")
+#turn on clone
+turnOnNewClone
 
-} catch{
-    write-host -ForegroundColor Red "Error: $_"
-}
-
-# create ansible inv file
-try{
-    write-host "Creating Ansible Inventory File..."
-    ConfCreation
-} catch{
-    write-host -ForegroundColor Red "Error: $_"
-}
-
-
-# Create the Run the ansible playbook
-try{
-    write-host "Running Ansible Playbook..."
-    {"FILL THIS IN"}
-} catch{
-    write-host -ForegroundColor Red "Error: $_"
-}
+#prep clone
+CreateScript -csv_path $csv

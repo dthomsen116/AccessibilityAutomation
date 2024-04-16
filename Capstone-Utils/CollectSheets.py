@@ -27,9 +27,10 @@ for response in responses:
     sk = response['Would you like to enable Sticky Keys?']
     alert = response['Would you like to show audio alerts visually?']
     languages = response['Select all additional languages for keyboard loadout']
+    comment = response['Do you need any additional accommodations that can be set up (additional software/hardware)?']
 
     # Create a list with cleaned data
-    cleaned_data = [fn, ln, narrator, magnifier, larger, osk, sk, alert, languages]
+    cleaned_data = [fn, ln, narrator, magnifier, larger, osk, sk, alert, languages, comment]
 
     # Create a filename
     filename = f"AccessibilityAutomation/Capstone-Utils/CSVs/{fn}-{ln}.csv"

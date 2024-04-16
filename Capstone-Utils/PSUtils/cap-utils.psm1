@@ -45,6 +45,39 @@ function Connect-Cap([string] $server){
     }
 }
 
+function Select-VM(){
+    try{
+        $vm=$null
+        $vms = Get-VM -Location $folder
+        $index = 1
+        Write-Host ""
+        Write-Host "Select a VM" 
+        foreach ($vm in $vms){
+            Write-Host -ForegroundColor Cyan [$index] $vm.Name 
+            if ($vm.PowerState -eq "PoweredOn") {
+                Write-Host -ForegroundColor Green "Powered On"
+                }   
+            else {
+                Write-Host -ForegroundColor Red "Powered Off"
+                }
+
+            Write-Host ""
+            $index++
+            }
+        Write-Host ""
+        $selection = Read-Host "Select a VM by number"
+        $vm = $vms[$selection-1]
+        Write-Host ""
+        Write-Host -ForegroundColor Green "Selected VM: $($vm.Name)"
+        return $vm
+        }
+    catch{
+        Write-Host -ForegroundColor Red "Error selecting VM"
+        return $null
+    }
+}
+
+
 function Disconnect-Cap(){
     #are we already connected?
     if ($global:DefaultVIServer){
@@ -57,20 +90,17 @@ function Disconnect-Cap(){
 }
 
 function CreateClone([string] $csv_path) {
-    # Check if the file exists
     if (!(Test-Path $csv_path)) {
         Write-Host -ForegroundColor Red "File not found at $csv_path"
         return $null
     }
     else {
-        # Read the file as text
+    
         $fileContent = Get-Content -Path $csv_path
     
-        # Split the file content by newlines to get rows
+
         $csv = $fileContent -split '\r?\n' | ForEach-Object {
-            # Split each row by the appropriate delimiter 
             $_ -split ',' | ForEach-Object {
-                # Trim any whitespace
                 $_.Trim()
             }
         }
@@ -80,8 +110,8 @@ function CreateClone([string] $csv_path) {
     }
     try {
         $newName = $csv[0] + '-' + $csv[1]
-        New-VM -Name $newname -VM 'Win10Base' -Datastore 'datastore2' -VMHost "192.168.7.24" -Location 'WorkEnv' -LinkedClone -ReferenceSnapshot 'Base'
-        Write-Host -ForegroundColor Green "Full Clone created: $clone_name"
+        New-VM -Name $newName -VM 'Win10Base' -Datastore 'datastore2' -VMHost "192.168.7.24" -Location 'WorkEnv' -LinkedClone -ReferenceSnapshot 'Base'
+        Write-Host -ForegroundColor Green "Full Clone created: $newName" # changed $clone_name to $newName
     }
     catch {
         Write-Host -ForegroundColor Red "Error creating clone"
@@ -90,10 +120,10 @@ function CreateClone([string] $csv_path) {
 }
 
 function turnOnNewClone(){
-    $newVM = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
+    $newVM = Select-VM
     try{
-        Start-VM -VM $NewVM -Confirm:$false
-        Write-Host -ForegroundColor Green "VM $($NewVM.Name) powered on"
+        Start-VM -VM $newVM -Confirm:$false
+        Write-Host -ForegroundColor Green "VM $($newVM.Name) powered on"
     }
     catch{
         Write-Host -ForegroundColor Red "Error powering on VM"
@@ -101,40 +131,43 @@ function turnOnNewClone(){
     }
 }
 
-function ConfCreation(){
-    $newVM = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
-    $ip = $newVM.Guest.IPAddress[0]
-    $hostname = "hostname=" + $newVM.Name + "_WorkEnv"
-    #$mac = "mac=$($newVM.NetworkAdapters.MACAddress)"
-    $dns = "name_server=10.0.17.4"
-    $gateway = "gateway=10.0.17.2"
-    $confip = "ip=$ip"
-    $conf = 
-    @"
-[$($newVM.Name)]
-$ip $confip $hostname $dns $gateway
-"@
+# function ConfCreation(){
+    
+#     $newVM = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
 
-    try{
-        $path = "/home/david/Documents/AccessibilityAutomation/Capstone-Utils/Ansible/Confs/$($newVM.Name).txt"
-        #check if the file exists
-        if (Test-Path $path){
-            Write-Host -ForegroundColor Red "File already exists at $path"
-            return $null
-        }
-        else{
-            try{
-                $conf | Out-File -FilePath $path
-            } catch {
-                Write-Host -ForegroundColor Red "Error creating file"
-                write-host $_.Exception.Message
-            }
-        }
-    } catch {
-        Write-Host -ForegroundColor Red "Error creating configuration"
-        write-host $_.Exception.Message
-    }
-}
+#     $ip = $newVM.Guest.IPAddress[0]
+#     $hostname = "hostname=" + $newVM.Name + "_WorkEnv"
+#     #$mac = "mac=$($newVM.NetworkAdapters.MACAddress)"
+#     $dns = "name_server=10.0.17.4"
+#     $gateway = "gateway=10.0.17.2"
+#     $confip = "ip=$ip"
+    
+#     $conf = 
+#     @"
+# [$($newVM.Name)]
+# $ip $confip $hostname $dns $gateway
+# "@
+
+#     try{
+#         $path = "/home/david/Documents/AccessibilityAutomation/Capstone-Utils/Ansible/Confs/$($newVM.Name).txt"
+#         #check if the file exists
+#         if (Test-Path $path){
+#             Write-Host -ForegroundColor Red "File already exists at $path"
+#             return $null
+#         }
+#         else{
+#             try{
+#                 $conf | Out-File -FilePath $path
+#             } catch {
+#                 Write-Host -ForegroundColor Red "Error creating file"
+#                 write-host $_.Exception.Message
+#             }
+#         }
+#     } catch {
+#         Write-Host -ForegroundColor Red "Error creating configuration"
+#         write-host $_.Exception.Message
+#     }
+# }
 
 function VmStatus([String] $vm){
     $guest = Get-VMGuest -VM $vm
@@ -157,12 +190,12 @@ function VmStatus([String] $vm){
     }
 }
 function JoinDomain(){
-    $vm = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
+    $vm = Select-VM
     $hostname = $vm.Name + "-WorkEnv"
     Invoke-VMScript -ScriptType Powershell -ScriptText "Add-Computer -DomainName capstone.local -Restart" -VM $vm -GuestCredential (Get-Credential)
     }
 function ChangeHostname(){
-    $vm = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
+    $vm = Select-VM
     $hostname = $vm.Name + "-WorkEnv"
     Invoke-VMScript -ScriptType Powershell -Verbose -ScriptText "Rename-Computer -NewName $hostname -Force -Restart" -VM $vm -GuestCredential (Get-Credential)
     }
@@ -174,8 +207,10 @@ function DNSRecord(){
     $ip = $vm.guest.IPAddress[0]
     Invoke-VMScript -ScriptText "Add-DnsServerResourceRecordA -Name $recordName -ZoneName $zonename -AllowUpdateAny -IPv4Address $ip" -VM $vm -GuestCredential (Get-Credential) 
 }
+
+
 function CreateScript([string] $csv_path) {
-    $newVM = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
+    $newVM = Select-VM
     $filename = $newVM.Name 
     $path = "AccessibilityAutomation/Capstone-Utils/CSVs/$filename.csv"
     $file = Get-Content -Path $csv_path
@@ -184,6 +219,8 @@ function CreateScript([string] $csv_path) {
         $individuals = $item -split ',' | ForEach-Object {
             $_.Trim()
         }
+        $fn = $individuals[0]
+        $ln = $individuals[1]        
         $narrator = $individuals[2]
         $magnifier = $individuals[3]
         $larger = $individuals[4]
@@ -201,12 +238,32 @@ function CreateScript([string] $csv_path) {
         $ru = $individuals[16]
         $comment = $individuals[17]
 
-        try {
+       try {
+                #debug 
+                Write-Host "First Name: $fn"
+                Write-Host "Last Name: $ln"
+                Write-Host "Narrator: $narrator"
+                Write-Host "Magnifier: $magnifier"
+                Write-Host "Larger: $larger"
+                Write-Host "OSK: $osk"
+                Write-Host "Sticky Keys: $stickykeys"
+                Write-Host "Visual Alerts: $visualalerts"
+                Write-Host "English: $en"
+                Write-Host "Spanish: $sp"
+                Write-Host "French: $fr"
+                Write-Host "German: $ge"
+                Write-Host "Chinese (Simplified): $chS"
+                Write-Host "Chinese (Traditional): $chT"
+                Write-Host "Japanese: $ja"
+                Write-Host "Korean: $ko"
+                Write-Host "Russian: $ru"
+                Write-Host "Comment: $comment"
                 $regScript += "Windows Registry Editor Version 5.00"
                 $regScript += ""
                 $regScript += "[HKEY_CURRENT_USER\Control Panel\Accessibility\On]"
                 $regScript += '"On"="1"'
                 $regScript += ""
+                
             if ($narrator -eq "yes") {
                 $regScript += '[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Accessibility]'
                 $regScript += '"Configuration"="Narrator"'
@@ -229,16 +286,17 @@ function CreateScript([string] $csv_path) {
 
             }
             if ($osk -eq "yes") {
-                $regScript += '[HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Authentication\LogonUI]'
-                $regScript += '"ShowTabletKeyboard"=dword:1'
+                try {
+                    # Invoke the osk command on the target VM
+                    Invoke-Command -ComputerName $newVM.Name -ScriptBlock { 
+                        '(New-Object -ComObject WScript.Shell).CreateShortcut("$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\osk.lnk"); $shortcut.TargetPath = "C:\Windows\System32\osk.exe"; $shortcut.Save(); cp "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\osk.lnk" "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\"'
+                    }
+                    Write-Host "On-Screen Keyboard (OSK) has been enabled on $($newVM.Name)."
+                } catch {
+                    Write-Host "Failed to enable On-Screen Keyboard (OSK) on $($newVM.Name): $_"
+                }
             }
-            if ($stickykeys -eq "yes") {
-                $regScript += '[HKEY_CURRENT_USER\Control Panel\Accessibility\StickyKeys]'
-                $regScript += '"Flags"="506"'
-                $regScript += ""
-                $regScript += '[HKEY_CURRENT_USER\Control Panel\Accessibility\Keyboard Response]'
-                $regScript += '"Flags"="122"'
-            }
+            
             if ($visualalerts -eq "yes") {
                 $regScript += '[HKEY_CURRENT_USER\Control Panel\Accessibility\ShowSounds]'
                 $regScript += '"On"="1"'
@@ -269,27 +327,30 @@ function CreateScript([string] $csv_path) {
                 # Check if the file already exists
                 if (Test-Path $scriptPath) {
                     Write-Host -ForegroundColor Red "File already exists at $scriptPath"
-                    Write-Host "Continuing..."
-                    $regScript | Out-File -FilePath $scriptPath
-                    Write-host -ForegroundColor Green "Script created at $scriptPath"
-                } else {
-                    New-Item -Path $scriptPath -ItemType File
-                    $regScript | Out-File -FilePath $scriptPath
+                    return $null
+                }
+                else{
+                    try{
+                        $regScript | Out-File -FilePath $scriptPath
+                    } catch {
+                        Write-Host -ForegroundColor Red "Error creating file"
+                        write-host $_.Exception.Message
+                    }
                 }
             } catch {
-                Write-Host -ForegroundColor Red "Error creating script"
-                Write-Host $_.Exception.Message
+                Write-Host -ForegroundColor Red "Error creating configuration"
+                write-host $_.Exception.Message
             }
         } catch {
-            Write-Host -ForegroundColor Red "Error creating script"
-            Write-Host $_.Exception.Message
+            Write-Host -ForegroundColor Red "Error creating configuration"
+            write-host $_.Exception.Message
         }
     }
 }
 
 
 function SelectCsv(){
-    $files = Get-ChildItem '/home/david/Documents/AccessibilityAutomation/Capstone-Utils/CSVs'
+    $files = Get-ChildItem '/home/david/Documents/AccessibilityAutomation/Capstone-Utils/CSVs' -Exclude '/home/david/Documents/AccessibilityAutomation/Capstone-Utils/CSVs/credentials.json'
 
     for ($i = 0; $i -lt $files.Count; $i++) {
         Write-Host "$($i + 1). $($files[$i].Name)"
@@ -300,7 +361,7 @@ function SelectCsv(){
     if ($selectedIndex -ge 1 -and $selectedIndex -le $files.Count) {
         $selectedFile = $files[$selectedIndex - 1]
         Write-Host "You have selected: $($selectedFile.FullName)"
-        return $selectedFile.FullName
+        return $selectedFile.FullName -as [string]
     } else {
         Write-Host "Invalid selection. Please enter a valid index."
 }
