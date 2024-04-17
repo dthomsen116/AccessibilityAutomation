@@ -32,7 +32,7 @@ $csv = SelectCsv
 
 
 # debug 
-write-host "CSV: $csv"
+# write-host "CSV: $csv"
 
 #create clone 
 try{
@@ -45,7 +45,10 @@ catch{
 }
 
 #turn on clone
-turnOnNewClone
+turnOnNewClone -csv_path $csv
 
 #prep clone
 CreateScript -csv_path $csv
+
+#invoke the script
+invokeReg -csv_path $csv

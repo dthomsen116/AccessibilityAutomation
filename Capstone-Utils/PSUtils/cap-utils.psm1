@@ -110,7 +110,7 @@ function CreateClone([string] $csv_path) {
     }
     try {
         $newName = $csv[0] + '-' + $csv[1]
-        New-VM -Name $newName -VM 'Win10Base' -Datastore 'datastore2' -VMHost "192.168.7.24" -Location 'WorkEnv' -LinkedClone -ReferenceSnapshot 'Base'
+        New-VM -Name $newName -VM 'Win10Base' -Datastore 'datastore2' -VMHost "192.168.7.24" -Location 'WorkEnv' -LinkedClone -ReferenceSnapshot 'Base(VM)3'
         Write-Host -ForegroundColor Green "Full Clone created: $newName" # changed $clone_name to $newName
     }
     catch {
@@ -119,8 +119,16 @@ function CreateClone([string] $csv_path) {
     }
 }
 
-function turnOnNewClone(){
-    $newVM = Select-VM
+function turnOnNewClone([string] $csv_path){
+    $file = Get-Content -Path $csv_path
+    
+    foreach($item in $file) {
+        $individuals = $item -split ',' | ForEach-Object {
+            $_.Trim()
+        }
+        $fn = $individuals[0]
+        $ln = $individuals[1]   
+    $newVM = Get-VM -Name "$fn-$ln"
     try{
         Start-VM -VM $newVM -Confirm:$false
         Write-Host -ForegroundColor Green "VM $($newVM.Name) powered on"
@@ -130,7 +138,7 @@ function turnOnNewClone(){
         write-host $_.Exception.Message
     }
 }
-
+}
 # function ConfCreation(){
     
 #     $newVM = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
@@ -210,7 +218,8 @@ function DNSRecord(){
 
 
 function CreateScript([string] $csv_path) {
-    $newVM = Select-VM
+    #$newVM = Select-VM
+    
     $filename = $newVM.Name 
     $path = "AccessibilityAutomation/Capstone-Utils/CSVs/$filename.csv"
     $file = Get-Content -Path $csv_path
@@ -220,7 +229,8 @@ function CreateScript([string] $csv_path) {
             $_.Trim()
         }
         $fn = $individuals[0]
-        $ln = $individuals[1]        
+        $ln = $individuals[1]   
+        $newVM = Get-VM -Name "$fn-$ln"     
         $narrator = $individuals[2]
         $magnifier = $individuals[3]
         $larger = $individuals[4]
@@ -236,28 +246,28 @@ function CreateScript([string] $csv_path) {
         $ja = $individuals[14]
         $ko = $individuals[15]
         $ru = $individuals[16]
-        $comment = $individuals[17]
+        $comment = $individuals[-1]
 
        try {
                 #debug 
-                Write-Host "First Name: $fn"
-                Write-Host "Last Name: $ln"
-                Write-Host "Narrator: $narrator"
-                Write-Host "Magnifier: $magnifier"
-                Write-Host "Larger: $larger"
-                Write-Host "OSK: $osk"
-                Write-Host "Sticky Keys: $stickykeys"
-                Write-Host "Visual Alerts: $visualalerts"
-                Write-Host "English: $en"
-                Write-Host "Spanish: $sp"
-                Write-Host "French: $fr"
-                Write-Host "German: $ge"
-                Write-Host "Chinese (Simplified): $chS"
-                Write-Host "Chinese (Traditional): $chT"
-                Write-Host "Japanese: $ja"
-                Write-Host "Korean: $ko"
-                Write-Host "Russian: $ru"
-                Write-Host "Comment: $comment"
+                # Write-Host "First Name: $fn"
+                # Write-Host "Last Name: $ln"
+                # Write-Host "Narrator: $narrator"
+                # Write-Host "Magnifier: $magnifier"
+                # Write-Host "Larger: $larger"
+                # Write-Host "OSK: $osk"
+                # Write-Host "Sticky Keys: $stickykeys"
+                # Write-Host "Visual Alerts: $visualalerts"
+                # Write-Host "English: $en"
+                # Write-Host "Spanish: $sp"
+                # Write-Host "French: $fr"
+                # Write-Host "German: $ge"
+                # Write-Host "Chinese (Simplified): $chS"
+                # Write-Host "Chinese (Traditional): $chT"
+                # Write-Host "Japanese: $ja"
+                # Write-Host "Korean: $ko"
+                # Write-Host "Russian: $ru"
+                # Write-Host "Comment: $comment"
                 $regScript += "Windows Registry Editor Version 5.00"
                 $regScript += ""
                 $regScript += "[HKEY_CURRENT_USER\Control Panel\Accessibility\On]"
@@ -271,9 +281,8 @@ function CreateScript([string] $csv_path) {
             }
             
             if ($magnifier -eq "yes") {
-                $regScript += '[HKEY_CURRENT_USER\Software\Microsoft\Windows NT\CurrentVersion\Accessibility]'
-                $regScript += '"Configuration"="Magnifier"'
-                $regScript += ""
+                Invoke-VMScript -VM $newVM -ScriptText 'AccessibilityAutomation/Capstone-Utils/magnifier.ps1' -GuestCredential (Get-Credential)
+
             }
             if ($larger -eq "yes") {
                 #tenforums.com/tutorials/5990-change-text-size-windows-10-a.html
@@ -286,15 +295,7 @@ function CreateScript([string] $csv_path) {
 
             }
             if ($osk -eq "yes") {
-                try {
-                    # Invoke the osk command on the target VM
-                    Invoke-Command -ComputerName $newVM.Name -ScriptBlock { 
-                        '(New-Object -ComObject WScript.Shell).CreateShortcut("$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\osk.lnk"); $shortcut.TargetPath = "C:\Windows\System32\osk.exe"; $shortcut.Save(); cp "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\osk.lnk" "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\"'
-                    }
-                    Write-Host "On-Screen Keyboard (OSK) has been enabled on $($newVM.Name)."
-                } catch {
-                    Write-Host "Failed to enable On-Screen Keyboard (OSK) on $($newVM.Name): $_"
-                }
+                Invoke-VMScript -VM $newVM -ScriptText 'AccessibilityAutomation/Capstone-Utils/osk.ps1' -GuestCredential (Get-Credential)
             }
             
             if ($visualalerts -eq "yes") {
@@ -323,7 +324,7 @@ function CreateScript([string] $csv_path) {
                 $regScript += ""
                 }            
             try {
-                $scriptPath = "AccessibilityAutomation/Capstone-Utils/Scripts/$filename-conf.reg"
+                $scriptPath = "AccessibilityAutomation/Capstone-Utils/Scripts/$fn-$ln-conf.reg"
                 # Check if the file already exists
                 if (Test-Path $scriptPath) {
                     Write-Host -ForegroundColor Red "File already exists at $scriptPath"
@@ -341,19 +342,20 @@ function CreateScript([string] $csv_path) {
                 Write-Host -ForegroundColor Red "Error creating configuration"
                 write-host $_.Exception.Message
             }
-        } catch {
+        }catch {
             Write-Host -ForegroundColor Red "Error creating configuration"
             write-host $_.Exception.Message
-        }
-    }
+        } 
+
+    } 
 }
 
 
 function SelectCsv(){
-    $files = Get-ChildItem '/home/david/Documents/AccessibilityAutomation/Capstone-Utils/CSVs' -Exclude '/home/david/Documents/AccessibilityAutomation/Capstone-Utils/CSVs/credentials.json'
+    $files = Get-ChildItem '/home/david/Documents/AccessibilityAutomation/Capstone-Utils/CSVs' -Filter *.csv
 
     for ($i = 0; $i -lt $files.Count; $i++) {
-        Write-Host "$($i + 1). $($files[$i].Name)"
+        Write-Host "$($i + 1). $($files[$i].Name)" -ForegroundColor Green
     }
 
     $selectedIndex = Read-Host "Enter the index of the file you want to select"
@@ -364,5 +366,22 @@ function SelectCsv(){
         return $selectedFile.FullName -as [string]
     } else {
         Write-Host "Invalid selection. Please enter a valid index."
+}
+}
+
+function invokeReg([string] $csv_path){
+    #grab the newest made vm
+    $file = Get-Content -Path $csv_path
+    foreach($item in $file) {
+        $individuals = $item -split ',' | ForEach-Object {
+            $_.Trim()
+        }
+        $fn = $individuals[0]
+        $ln = $individuals[1]
+    #$vm = Select-VM
+    $vm = Get-VM -Name "$fn-$ln"
+   
+    $scriptPath = "AccessibilityAutomation/Capstone-Utils/Scripts/$fn-$ln-conf.reg"
+    Invoke-VMScript -ScriptType Powershell -ScriptText "regedit /s $scriptPath" -VM $vm -GuestCredential (Get-Credential)
 }
 }
