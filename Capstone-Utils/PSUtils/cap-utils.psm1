@@ -220,6 +220,8 @@ function DNSRecord(){
 function CreateScript([string] $csv_path) {
     #$newVM = Select-VM
     
+    $credUser = Read-Host "Enter the username for the VM"
+    $credPass = Read-Host "Enter the password for the VM" -AsSecureString
     $filename = $newVM.Name 
     $path = "AccessibilityAutomation/Capstone-Utils/CSVs/$filename.csv"
     $file = Get-Content -Path $csv_path
@@ -235,7 +237,7 @@ function CreateScript([string] $csv_path) {
         $magnifier = $individuals[3]
         $larger = $individuals[4]
         $osk = $individuals[5]
-        $stickykeys = $individuals[6]
+        $darkmode = $individuals[6]
         $visualalerts = $individuals[7]
         $en = $individuals[8]
         $sp = $individuals[9]
@@ -249,99 +251,89 @@ function CreateScript([string] $csv_path) {
         $comment = $individuals[-1]
 
        try {
-                #debug 
-                # Write-Host "First Name: $fn"
-                # Write-Host "Last Name: $ln"
-                # Write-Host "Narrator: $narrator"
-                # Write-Host "Magnifier: $magnifier"
-                # Write-Host "Larger: $larger"
-                # Write-Host "OSK: $osk"
-                # Write-Host "Sticky Keys: $stickykeys"
-                # Write-Host "Visual Alerts: $visualalerts"
-                # Write-Host "English: $en"
-                # Write-Host "Spanish: $sp"
-                # Write-Host "French: $fr"
-                # Write-Host "German: $ge"
-                # Write-Host "Chinese (Simplified): $chS"
-                # Write-Host "Chinese (Traditional): $chT"
-                # Write-Host "Japanese: $ja"
-                # Write-Host "Korean: $ko"
-                # Write-Host "Russian: $ru"
-                # Write-Host "Comment: $comment"
-                $regScript += "Windows Registry Editor Version 5.00"
-                $regScript += ""
-                $regScript += "[HKEY_CURRENT_USER\Control Panel\Accessibility\On]"
-                $regScript += '"On"="1"'
-                $regScript += ""
                 
             if ($narrator -eq "yes") {
-                $regScript += '[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Accessibility]'
-                $regScript += '"Configuration"="Narrator"'
-                $regScript += ""
+                
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/narrator.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "Narrator enabled"
             }
-            
+        
             if ($magnifier -eq "yes") {
-                Invoke-VMScript -VM $newVM -ScriptText 'AccessibilityAutomation/Capstone-Utils/magnifier.ps1' -GuestCredential (Get-Credential)
 
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/magnifier.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "Magnifier enabled"
             }
             if ($larger -eq "yes") {
                 #tenforums.com/tutorials/5990-change-text-size-windows-10-a.html
-                $regScript += "[HKEY_CURRENT_CONFIG\Software\Fonts]"
-                $regScript += '"LogPixels"=dword:00000144'
-                $regScript += ""
-                $regScript += "[HKEY_CURRENT_USER\Control Panel\Desktop]"
-                $regScript += '"Win8DpiScaling"=dword:1'
-                $regScript += ""
-
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/scaling.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "Display Scaling increased"
             }
             if ($osk -eq "yes") {
-                Invoke-VMScript -VM $newVM -ScriptText 'AccessibilityAutomation/Capstone-Utils/osk.ps1' -GuestCredential (Get-Credential)
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/osk.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "On-Screen Keyboard enabled"
             }
-            
             if ($visualalerts -eq "yes") {
-                $regScript += '[HKEY_CURRENT_USER\Control Panel\Accessibility\ShowSounds]'
-                $regScript += '"On"="1"'
-                $regScript += ""
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/visualAlerts.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "Visual Alerts enabled"
             }
-            # Create an array to store language tags
-            $languages = @()
-
-            # Check each language variable and add its language tag to the $languages array
-            if ($en -eq 'English') { $languages += "en-US" }
-            if ($sp -eq 'Spanish') { $languages += "es-ES" }
-            if ($fr -eq 'French') { $languages += "fr-FR" }
-            if ($ge -eq 'German') { $languages += "de-DE" }
-            if ($chS -eq 'Chinese (Simplified)') { $languages += "zh-CN" }
-            if ($chT -eq 'Chinese (Traditional)') { $languages += "zh-TW" }
-            if ($ja -eq 'Japanese') { $languages += "ja-JP" }
-            if ($ko -eq 'Korean') { $languages += "ko-KR" }
-            if ($ru -eq 'Russian') { $languages += "ru-RU" }
-
-            # Add language settings to the .reg script
-            foreach ($language in $languages) {
-                $regScript += "[HKEY_CURRENT_USER\Keyboard Layout\Preload]"
-                $regScript += "`"`"1`"`"=`"$language`""
-                $regScript += ""
-                }            
-            try {
-                $scriptPath = "AccessibilityAutomation/Capstone-Utils/Scripts/$fn-$ln-conf.reg"
-                # Check if the file already exists
-                if (Test-Path $scriptPath) {
-                    Write-Host -ForegroundColor Red "File already exists at $scriptPath"
-                    return $null
-                }
-                else{
-                    try{
-                        $regScript | Out-File -FilePath $scriptPath
-                    } catch {
-                        Write-Host -ForegroundColor Red "Error creating file"
-                        write-host $_.Exception.Message
-                    }
-                }
-            } catch {
-                Write-Host -ForegroundColor Red "Error creating configuration"
-                write-host $_.Exception.Message
+            if ($darkmode -eq "yes") {
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/darkmode.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "Dark Mode enabled"
             }
+            if ($en -eq 'English') { 
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/english.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "English Added"
+             }
+            if ($sp -eq 'Spanish') { 
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/spanish.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "Spanish Added"
+             }
+            if ($fr -eq 'French') { 
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/french.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "French Added"
+             }
+            if ($ge -eq 'German') { 
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/german.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "German Added"
+             }
+            if ($chS -eq 'Chinese (Simplified)') { 
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/chineseS.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "Chinese (Simplified) Added"
+             }
+            if ($chT -eq 'Chinese (Traditional)') { 
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/chineseT.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "Chinese (Traditional) Added"
+            }
+            if ($ja -eq 'Japanese') { 
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/japanese.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "Japanese Added"
+            }
+            if ($ko -eq 'Korean') { 
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/korean.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "Korean Added" }
+            if ($ru -eq 'Russian') { 
+                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/russian.ps1' -Raw
+                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                Write-Host -ForegroundColor Green "Russian Added"
+             }
+             
+             Invoke-Command -VMName $newVM -ScriptBlock "Set-WinUser-LanguageList -LanguageList $t" -Credential (Get-Credential)
+
+
         }catch {
             Write-Host -ForegroundColor Red "Error creating configuration"
             write-host $_.Exception.Message

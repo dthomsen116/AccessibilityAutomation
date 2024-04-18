@@ -10,7 +10,7 @@ try{
 try{
     Write-Host
     Write-Host -NoNewline -ForegroundColor Cyan "Please submit the form at the following link: "
-    Write-Host -ForegroundColor Magenta "https://forms.gle/KmjDi6ymKADZFmYV6"
+    Write-Host -ForegroundColor Magenta "https://forms.gle/GXCtRy1oD9VZxsdm8"
     Write-Host
     Read-host "Press Enter to continue"
 } catch{
@@ -47,8 +47,15 @@ catch{
 #turn on clone
 turnOnNewClone -csv_path $csv
 
+#Wait
+write-host "Waiting for the clone to be ready..."
+$i = 0
+sleep 5
+write-host -ForegroundColor cyan "..."
+sleep 5
+write-host -ForegroundColor cyan "..."
+sleep 5
+write-host -ForegroundColor cyan "still waiting..."
+sleep 5
 #prep clone
 CreateScript -csv_path $csv
-
-#invoke the script
-invokeReg -csv_path $csv

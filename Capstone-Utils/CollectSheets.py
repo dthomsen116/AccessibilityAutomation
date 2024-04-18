@@ -21,13 +21,13 @@ for response in responses:
     #print(response)
     fn = response['First Name'].lower()
     ln = response['Last Name'].lower()
-    narrator = response['Would you like to Enable Narrator?']
-    magnifier = response['Would you like to Enable Magnifier?']
-    larger = response['Would you like to enable Larger Text?']
+    narrator = response['Would you like to enable Narrator?']
+    magnifier = response['Would you like to enable Magnifier?']
+    larger = response['Would you like to enable a scaled display?']
     osk = response['Would you like to enable the On Screen Keyboard?']
-    sk = response['Would you like to enable Sticky Keys?']
+    sk = response['Would you like to enable dark mode?']
     alert = response['Would you like to show audio alerts visually?']
-    languages = response['Select all additional languages for keyboard loadout']
+    languages = response['Select all additional languages for keyboard layouts']
     comment = response['Do you need any additional accommodations that can be set up (additional software/hardware)? ']
 
     # Create a list with cleaned data 
