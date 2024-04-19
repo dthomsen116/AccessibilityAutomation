@@ -32,8 +32,8 @@ I plan to continue work on this as a side project to tie up these loose ends aft
 | Sprint 1: Migration for HyperV| [Link for Sprint One](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Sprint-One) |
 | Speed Sprint 1.5: Migration to Vsphere | [Link for Sprint One and a Half (resolved multiple prior issues)](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Update-to-Sprint-One) |
 | Sprint 2: Form / Script Creation | [Link for Sprint Two](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Sprint-Two) |
-| Sprint 3: Ansible and Environment Rollout | [Link for Sprint Three](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Sprint-Three)|
-| Sprint 4: GPO and Polish | [Link for Sprint Four](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Sprint-Four) |
+| Sprint 3: Invoking and Environment Rollout | [Link for Sprint Three](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Sprint-Three)|
+| Sprint 4: Fixing and Polish | [Link for Sprint Four](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Sprint-Four) |
 
 
 
