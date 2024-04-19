@@ -48,18 +48,18 @@ catch{
 turnOnNewClone -csv_path $csv
 
 #Wait
-# write-host "Waiting for the clone to be ready..."
-# sleep 5
-# write-host -ForegroundColor cyan "..."
-# sleep 5
-# write-host -ForegroundColor cyan "..."
-# sleep 5
-# write-host -ForegroundColor cyan "still waiting..."
-# sleep 5
-# write-host -ForegroundColor cyan "Almost there..."
+write-host "Waiting for the clone to be ready..."
+sleep 5
+write-host -ForegroundColor cyan "..."
+sleep 5
+write-host -ForegroundColor cyan "..."
+sleep 5
+write-host -ForegroundColor cyan "still waiting..."
+sleep 5
+write-host -ForegroundColor cyan "Almost there..."
 
 #prep clone
-#CreateScript -csv_path $csv
+CreateScript -csv_path $csv
 
 #create report
 create_report -csv_path $csv
