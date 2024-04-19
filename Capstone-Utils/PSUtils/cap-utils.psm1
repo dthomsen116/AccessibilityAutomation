@@ -423,7 +423,7 @@ EOF
                     Write-Host -ForegroundColor Red "File already exists at $path"
                 } else {
                     $reportContent | Out-File -FilePath $path
-                    Write-Host "Report saved to $path"
+                    Write-Host -ForegroundColor Green "Report saved to $path"
                 }
             } else {
                 Write-Host -ForegroundColor Red "Directory does not exist: $(Split-Path $path -Parent)"
