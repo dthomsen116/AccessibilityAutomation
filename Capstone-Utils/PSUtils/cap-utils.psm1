@@ -357,19 +357,81 @@ function SelectCsv(){
 }
 }
 
-function invokeReg([string] $csv_path){
-    #grab the newest made vm
+function create_report([string] $csv_path) {
+    $Report = @()
     $file = Get-Content -Path $csv_path
-    foreach($item in $file) {
+    foreach ($item in $file) {
         $individuals = $item -split ',' | ForEach-Object {
             $_.Trim()
         }
         $fn = $individuals[0]
         $ln = $individuals[1]
-    #$vm = Select-VM
-    $vm = Get-VM -Name "$fn-$ln"
-   
-    $scriptPath = "AccessibilityAutomation/Capstone-Utils/Scripts/$fn-$ln-conf.reg"
-    Invoke-VMScript -ScriptType Powershell -ScriptText "regedit /s $scriptPath" -VM $vm -GuestCredential (Get-Credential)
-}
+        $filename = "$fn-$ln"
+        $settingsNames = @("Narrator", "Magnifier", "Scaled Display", "On-Screen Keyboard", "Dark Mode", "Visual Audio Alerts")
+        $comment = $individuals[-1]
+
+        $requestedSettings = @()
+        $appliedSettings = @()
+
+        for ($i = 2; $i -le 7; $i++) {
+            if ($individuals[$i] -eq "yes") {
+                $requestedSettings += "- $($settingsNames[$i - 2])"
+                $appliedSettings += "- $($settingsNames[$i - 2]) : $($individuals[$i])"
+            }
+        }
+
+        for ($i = 8; $i -le 16; $i++) {
+            if ($individuals[$i] -eq "yes") {
+                $requestedSettings += "- $($settingsNames[$i - 1])"
+                $appliedSettings += "- $($settingsNames[$i - 1]) : $($individuals[$i])"
+            }
+        }
+
+        # Define a list of known languages
+        $knownLanguages = @("English", "Spanish", "French", "German", "Chinese (Simplified)", "Chinese (Traditional)", "Japanese", "Korean", "Russian")
+
+        # Filter out languages that are not in the known languages list
+        $enabledLanguages = $individuals[8..16] | Where-Object { $_ -in $knownLanguages }
+
+        $reportContent = @"
+Accessibility Report for $fn $ln
+-----------------------------------
+Requested Settings:
+------------------
+$($requestedSettings -join "`n")
+
+Applied Settings:
+-----------------
+$($appliedSettings -join "`n")
+
+Languages Enabled:
+----------
+$($enabledLanguages -join "`n")
+
+Additional Comments/Needs:
+-------------------
+$comment
+
+-----------------------------------
+EOF
+"@
+
+        try {
+            $path = Join-Path -Path "AccessibilityAutomation/Capstone-Utils/Reports" -ChildPath "$filename.txt"
+            if (Test-Path (Split-Path $path -Parent) -PathType Container) {
+                if (Test-Path $path) {
+                    Write-Host -ForegroundColor Red "File already exists at $path"
+                } else {
+                    $reportContent | Out-File -FilePath $path
+                    Write-Host "Report saved to $path"
+                }
+            } else {
+                Write-Host -ForegroundColor Red "Directory does not exist: $(Split-Path $path -Parent)"
+            }
+        } catch {
+            Write-Host -ForegroundColor Red "Error creating file"
+            Write-Host $_.Exception.Message
+        }
+    }
+    return $Report
 }

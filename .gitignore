@@ -2,3 +2,5 @@
 /Capstone-Utils/Ansible/Confs/*
 /Capstone-Utils/Scripts/*
 /credentials.json
+/Capstone-Utils/Reports/*
+/Capstone-Utils/Lang/*
