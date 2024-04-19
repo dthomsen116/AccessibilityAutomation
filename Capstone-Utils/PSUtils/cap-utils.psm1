@@ -221,7 +221,7 @@ function CreateScript([string] $csv_path) {
     #$newVM = Select-VM
     
     $credUser = Read-Host "Enter the username for the VM"
-    $credPass = Read-Host "Enter the password for the VM" -AsSecureString
+    $credPass = Read-Host "Enter the password for the VM" -AsSecureString    
     $filename = $newVM.Name 
     $path = "AccessibilityAutomation/Capstone-Utils/CSVs/$filename.csv"
     $file = Get-Content -Path $csv_path
@@ -286,54 +286,49 @@ function CreateScript([string] $csv_path) {
                 Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
                 Write-Host -ForegroundColor Green "Dark Mode enabled"
             }
+            $lang = @()
             if ($en -eq 'English') { 
-                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/english.ps1' -Raw
-                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                $lang += "en-US"
                 Write-Host -ForegroundColor Green "English Added"
-             }
+            }
             if ($sp -eq 'Spanish') { 
-                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/spanish.ps1' -Raw
-                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                $lang += "es-ES"
                 Write-Host -ForegroundColor Green "Spanish Added"
-             }
+            }
             if ($fr -eq 'French') { 
-                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/french.ps1' -Raw
-                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                $lang += "fr-FR"
                 Write-Host -ForegroundColor Green "French Added"
-             }
+            }
             if ($ge -eq 'German') { 
-                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/german.ps1' -Raw
-                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                $lang += "de-DE"
                 Write-Host -ForegroundColor Green "German Added"
-             }
+            }
             if ($chS -eq 'Chinese (Simplified)') { 
-                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/chineseS.ps1' -Raw
-                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                $lang += "zh-CN"
                 Write-Host -ForegroundColor Green "Chinese (Simplified) Added"
-             }
+            }
             if ($chT -eq 'Chinese (Traditional)') { 
-                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/chineseT.ps1' -Raw
-                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                $lang += "zh-TW"
                 Write-Host -ForegroundColor Green "Chinese (Traditional) Added"
             }
             if ($ja -eq 'Japanese') { 
-                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/japanese.ps1' -Raw
-                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                $lang += "ja-JP"
                 Write-Host -ForegroundColor Green "Japanese Added"
             }
             if ($ko -eq 'Korean') { 
-                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/korean.ps1' -Raw
-                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
-                Write-Host -ForegroundColor Green "Korean Added" }
+                $lang += "ko-KR"
+                Write-Host -ForegroundColor Green "Korean Added"
+            }
             if ($ru -eq 'Russian') { 
-                $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/russian.ps1' -Raw
-                Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+                $lang += "ru-RU"
                 Write-Host -ForegroundColor Green "Russian Added"
-             }
-             
-             Invoke-Command -VMName $newVM -ScriptBlock "Set-WinUser-LanguageList -LanguageList $t" -Credential (Get-Credential)
-
-
+            }
+            $lang = $lang -join ',' 
+            $filePath = "AccessibilityAutomation/Capstone-Utils/Lang/$fn-$ln-lang.ps1"
+            $script = "Set-WinUserLanguageList $lang -Force" | Out-File -FilePath $filePath -Force
+            $script = Get-Content -Path $filePath -Raw
+            Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
+            
         }catch {
             Write-Host -ForegroundColor Red "Error creating configuration"
             write-host $_.Exception.Message
