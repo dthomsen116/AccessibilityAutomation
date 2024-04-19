@@ -328,7 +328,8 @@ function CreateScript([string] $csv_path) {
             $script = "Set-WinUserLanguageList $lang -Force" | Out-File -FilePath $filePath -Force
             $script = Get-Content -Path $filePath -Raw
             Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
-            
+            Invoke-VMScript -VM $newVM -ScriptText "Restart-Computer -Force" -GuestUser $credUser -GuestPassword $credPass
+            Write-Host -ForegroundColor Green "Language settings applied. Restarting VM"
         }catch {
             Write-Host -ForegroundColor Red "Error creating configuration"
             write-host $_.Exception.Message

@@ -15,7 +15,7 @@ sheet = spreadsheet.sheet1
 # Extract all data from the sheet
 responses = sheet.get_all_records()
 
-print (responses)
+# print (responses)
 # Loop through each response and create a cleaned CSV file
 for response in responses:
     #print(response)
