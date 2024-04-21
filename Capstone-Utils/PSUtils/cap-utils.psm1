@@ -15,21 +15,27 @@ function Get-CapConfig([string] $config_path){
 function CapBanner(){
     $banner = @'
                                                                                                                  
-    ,------.                    ,--.   ,--.    ,--------.,--.                                                        
-    |  .-.  \  ,--,--.,--.  ,--.`--' ,-|  |    '--.  .--'|  ,---.  ,---. ,--,--,--. ,---.  ,---. ,--,--,             
-    |  |  \  :' ,-.  | \  `'  / ,--.' .-. |       |  |   |  .-.  || .-. ||        |(  .-' | .-. :|      \            
-    |  '--'  /\ '-'  |  \    /  |  |\ `-' |       |  |   |  | |  |' '-' '|  |  |  |.-'  `)\   --.|  ||  |            
-    `-------'  `--`--'   `--'   `--' `---'        `--'   `--' `--' `---' `--`--`--'`----'  `----'`--''--'            
-     ,-----.                       ,--.                            ,------.                ,--.               ,--.   
-    '  .--./ ,--,--. ,---.  ,---.,-'  '-. ,---. ,--,--,  ,---.     |  .--. ',--.--. ,---.  `--' ,---.  ,---.,-'  '-. 
-    |  |    ' ,-.  || .-. |(  .-''-.  .-'| .-. ||      \| .-. :    |  '--' ||  .--'| .-. | ,--.| .-. :| .--''-.  .-' 
-    '  '--'\\ '-'  || '-' '.-'  `) |  |  ' '-' '|  ||  |\   --.    |  | --' |  |   ' '-' ' |  |\   --.\ `--.  |  |   
-     `-----' `--`--'|  |-' `----'  `--'   `---' `--''--' `----'    `--'     `--'    `---'.-'  / `----' `---'  `--'   
-                    `--'                                                                 '---'                          
-
-                    https://Github.com/DTHOMSEN116/SYS-Cap 
+                                                                                                                                                                        
+,------.                    ,--.   ,--.    ,--------.,--.                                                                                                           
+|  .-.  \  ,--,--.,--.  ,--.`--' ,-|  |    '--.  .--'|  ,---.  ,---. ,--,--,--. ,---.  ,---. ,--,--,                                                                
+|  |  \  :' ,-.  | \  `'  / ,--.' .-. |       |  |   |  .-.  || .-. ||        |(  .-' | .-. :|      \                                                               
+|  '--'  /\ '-'  |  \    /  |  |\ `-' |       |  |   |  | |  |' '-' '|  |  |  |.-'  `)\   --.|  ||  |                                                               
+`-------'  `--`--'   `--'   `--' `---'        `--'   `--' `--' `---' `--`--`--'`----'  `----'`--''--'                                                               
+  ,---.            ,--.                             ,--.  ,--.                 
+ /  O  \ ,--.,--.,-'  '-. ,---. ,--,--,--. ,--,--.,-'  '-.`--',--,--,  ,---.   
+|  .-.  ||  ||  |'-.  .-'| .-. ||        |' ,-.  |'-.  .-',--.|      \| .-. |  
+|  | |  |'  ''  '  |  |  ' '-' '|  |  |  |\ '-'  |  |  |  |  ||  ||  |' '-' '  
+`--' `--' `----'   `--'   `---' `--`--`--' `--`--'  `--'  `--'`--''--'.`-  /   
+                                                                      `---'    
+  ,---.                                   ,--.,--.   ,--.,--.,--.  ,--.            
+ /  O  \  ,---. ,---. ,---.  ,---.  ,---. `--'|  |-. `--'|  |`--',-'  '-.,--. ,--. 
+|  .-.  || .--'| .--'| .-. :(  .-' (  .-' ,--.| .-. ',--.|  |,--.'-.  .-' \  '  /  
+|  | |  |\ `--.\ `--.\   --..-'  `).-'  `)|  || `-' ||  ||  ||  |  |  |    \   '   
+`--' `--' `---' `---' `----'`----' `----' `--' `---' `--'`--'`--'  `--'  .-'  /    
+                                                                          `---'      
 '@
 Write-host -ForegroundColor Cyan $banner
+Write-host -ForegroundColor Green "https://github.com/dthomsen116/AccessibilityAutomation"
 }
 
 function Connect-Cap([string] $server){
@@ -434,4 +440,34 @@ EOF
         }
     }
     return $Report
+}
+
+function CheckInv(){
+    #indexes all the CSV files in the CSVs directory and allows the user to select one to view
+    $files = Get-ChildItem '/home/david/Documents/AccessibilityAutomation/Capstone-Utils/CSVs' -Filter *.csv
+    $i = 0
+    foreach($file in $files){
+        Write-Host -ForegroundColor Cyan "[$i] $($file.Name)"
+        $i++
+    }
+    $selection = Read-Host "Select a file by number"
+    $selectedFile = $files[$selection]
+    $fileContent = Get-Content -Path $selectedFile.FullName
+    Write-Host -ForegroundColor Green "Content of $($selectedFile.Name):"
+    Write-Host $fileContent
+}
+
+function CheckRep(){
+    #indexes all the CSV files in the CSVs directory and allows the user to select one to view
+    $files = Get-ChildItem '/home/david/Documents/AccessibilityAutomation/Capstone-Utils/Reports' -Filter *.txt
+    $i = 0
+    foreach($file in $files){
+        Write-Host -ForegroundColor Cyan "[$i] $($file.Name)"
+        $i++
+    }
+    $selection = Read-Host "Select a file by number"
+    $selectedFile = $files[$selection]
+    $fileContent = Get-Content -Path $selectedFile.FullName
+    Write-Host -ForegroundColor Cyan "Content of $($selectedFile.Name):"
+    Write-Host -ForegroundColor Green $fileContent -Separator "`n"
 }
