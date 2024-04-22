@@ -1,4 +1,4 @@
-#Imports custom Module
+#Imports Capstone Module
 try{
     write-host "Importing Module..."
     import-Module "/home/david/Documents/AccessibilityAutomation/Capstone-Utils/PSUtils/cap-utils.psm1" -Force
@@ -25,14 +25,9 @@ try{
     Write-Host -ForegroundColor Red "Error: $_"
 }
 
-# Select the CSV to be used for additional configuration
-# Create the Configuration
+# Select the CSV
 write-host "Selecting CSV..."
 $csv = SelectCsv
-
-
-# debug 
-# write-host "CSV: $csv"
 
 #create clone 
 try{
@@ -44,10 +39,10 @@ catch{
     write-host -ForegroundColor Red "Error: $_"
 }
 
-#turn on clone
+# Turn on clone
 turnOnNewClone -csv_path $csv
 
-#Wait
+# Wait for the boot
 write-host "Waiting for the clone to be ready..."
 sleep 5
 write-host -ForegroundColor cyan "..."
@@ -58,8 +53,8 @@ write-host -ForegroundColor cyan "still waiting..."
 sleep 5
 write-host -ForegroundColor cyan "Almost there..."
 
-#prep clone
+# Prep clone
 CreateScript -csv_path $csv
 
-#create report
+# Create report
 create_report -csv_path $csv
