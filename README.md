@@ -4,11 +4,20 @@
 
 </div>
 
-<div align="center">
+
 
 ## Mission Statement:
 
-My goal with this project is to create an application that can be utilized during the onboarding process to allow all employees to customize a custom desktop designed for their accessibility. I am working with many different skills and tools that I have utilized throughout my [course history](https://github.com/dthomsen116#courseload) as my college years come to an end. By employing automation and empowering users to specify their accessibility preferences during desktop creation, I aim to contribute to a more inclusive digital workspace for the future of workplaces. 
+The primary objective of this project is to underscore the significance of integrating accessibility as a foundational element in workplace environments, rather than treating it as an afterthought. Through the implementation of this application, desktop environments are automatically constructed to ensure accessibility and functionality from creation. I utilized much of my previous expertise accumulated over years (detailed in course history), as well as picking up some new skills along the way to ensure the success of this project. By employing automation and empowering users to specify their accessibility preferences during desktop creation, I aim to contribute to a more inclusive 
+digital workspace for the future of workplaces. 
+
+## Use Case
+
+This tool is designed to streamline the onboarding process for new employees by facilitating the customization of their desktop environments based on individual accessibility requirements. Upon candidate selection, individuals are prompted to complete a form detailing their specific accessibility needs. This solution addresses two critical aspects of workplace accessibility:
+
+- Ensuring built-in accessibility for all employees, thereby enabling personalized desktop configurations tailored to individual needs.
+- Fostering an environment where employees with desktop accessibility requirements feel integrated rather than singled out, fostering a culture where every voice contributes to a more accommodating workspace.
+
 
 ## Main Directory: [HERE](https://github.com/dthomsen116/AccessibilityAutomation/wiki)
 
