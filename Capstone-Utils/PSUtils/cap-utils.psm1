@@ -1,21 +1,7 @@
-function Get-CapConfig([string] $config_path){
-    $conf = $null
-    if(test-path $config_path){
-        $conf= Get-Content -Raw -Path $config_path | ConvertFrom-Json
-        $msg = "Configuration file loaded from $config_path"
-        Write-Host -ForegroundColor Green $msg
-    }
-    else {
-        $msg = "Configuration file not found at $config_path"
-        Write-Host -ForegroundColor Red $msg
-    }
-    return $conf
-}
-
+# Capstone Banner
 function CapBanner(){
     $banner = @'
-                                                                                                                 
-                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                         
 ,------.                    ,--.   ,--.    ,--------.,--.                                                                                                           
 |  .-.  \  ,--,--.,--.  ,--.`--' ,-|  |    '--.  .--'|  ,---.  ,---. ,--,--,--. ,---.  ,---. ,--,--,                                                                
 |  |  \  :' ,-.  | \  `'  / ,--.' .-. |       |  |   |  .-.  || .-. ||        |(  .-' | .-. :|      \                                                               
@@ -34,23 +20,24 @@ function CapBanner(){
 `--' `--' `---' `---' `----'`----' `----' `--' `---' `--'`--'`--'  `--'  .-'  /    
                                                                           `---'      
 '@
+
 Write-host -ForegroundColor Cyan $banner
 Write-host -ForegroundColor Green "https://github.com/dthomsen116/AccessibilityAutomation"
 }
 
+# Function for Connection
 function Connect-Cap([string] $server){
-    #are we already connected?
     if ($global:DefaultVIServer){
         Write-Host -ForegroundColor Cyan "Already connected to $($global:DefaultVIServer.Name)"
         return
     }
     else {
-        #connect to the server
         Connect-VIServer -Server $server
         Write-Host -ForegroundColor Green "Connected to $server"
     }
 }
 
+# Function for Selecting a Virtual Machine
 function Select-VM(){
     try{
         $vm=$null
@@ -83,9 +70,8 @@ function Select-VM(){
     }
 }
 
-
+# Function for Disconnection
 function Disconnect-Cap(){
-    #are we already connected?
     if ($global:DefaultVIServer){
         Disconnect-VIServer -Server $global:DefaultVIServer -Confirm:$false
         Write-Host -ForegroundColor Green "Disconnected from vcenter.david.local"
@@ -95,24 +81,20 @@ function Disconnect-Cap(){
     }
 }
 
+# Function to Create a named clone
 function CreateClone([string] $csv_path) {
     if (!(Test-Path $csv_path)) {
         Write-Host -ForegroundColor Red "File not found at $csv_path"
         return $null
     }
     else {
-    
         $fileContent = Get-Content -Path $csv_path
-    
-
         $csv = $fileContent -split '\r?\n' | ForEach-Object {
             $_ -split ',' | ForEach-Object {
                 $_.Trim()
             }
         }
-    
         Write-Host -ForegroundColor Green "CSV file loaded from $csv_path"
-            
     }
     try {
         $newName = $csv[0] + '-' + $csv[1]
@@ -125,6 +107,7 @@ function CreateClone([string] $csv_path) {
     }
 }
 
+# Power on new clone
 function turnOnNewClone([string] $csv_path){
     $file = Get-Content -Path $csv_path
     
@@ -145,83 +128,8 @@ function turnOnNewClone([string] $csv_path){
     }
 }
 }
-# function ConfCreation(){
-    
-#     $newVM = Get-VM | Sort-Object -Property Created -Descending | Select-Object -First 1
 
-#     $ip = $newVM.Guest.IPAddress[0]
-#     $hostname = "hostname=" + $newVM.Name + "_WorkEnv"
-#     #$mac = "mac=$($newVM.NetworkAdapters.MACAddress)"
-#     $dns = "name_server=10.0.17.4"
-#     $gateway = "gateway=10.0.17.2"
-#     $confip = "ip=$ip"
-    
-#     $conf = 
-#     @"
-# [$($newVM.Name)]
-# $ip $confip $hostname $dns $gateway
-# "@
-
-#     try{
-#         $path = "/home/david/Documents/AccessibilityAutomation/Capstone-Utils/Ansible/Confs/$($newVM.Name).txt"
-#         #check if the file exists
-#         if (Test-Path $path){
-#             Write-Host -ForegroundColor Red "File already exists at $path"
-#             return $null
-#         }
-#         else{
-#             try{
-#                 $conf | Out-File -FilePath $path
-#             } catch {
-#                 Write-Host -ForegroundColor Red "Error creating file"
-#                 write-host $_.Exception.Message
-#             }
-#         }
-#     } catch {
-#         Write-Host -ForegroundColor Red "Error creating configuration"
-#         write-host $_.Exception.Message
-#     }
-# }
-
-function VmStatus([String] $vm){
-    $guest = Get-VMGuest -VM $vm
-    $network = Get-NetworkAdapter -VM $vm
-    
-
-    $i = 0
-    foreach($adapter in $network){
-        $name = $adapter.Name
-        $ip = $guest.IPAddress[$i] | Where-Object { $_ -match '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}' }
-        $mac = $adapter.MACAddress
-        $subnet = "255.255.255.0"
-
-        Write-Host -ForegroundColor Cyan "Network Information for $($name)"
-        Write-Host -ForegroundColor DarkCyan "Hostname: " $guest.Hostname
-        Write-Host -ForegroundColor DarkCyan "IP Address: $ip"
-        Write-Host -ForegroundColor DarkCyan "MAC Address: $mac"
-        Write-Host -ForegroundColor DarkCyan "Subnet: $subnet"
-        $i=$i+2
-    }
-}
-function JoinDomain(){
-    $vm = Select-VM
-    $hostname = $vm.Name + "-WorkEnv"
-    Invoke-VMScript -ScriptType Powershell -ScriptText "Add-Computer -DomainName capstone.local -Restart" -VM $vm -GuestCredential (Get-Credential)
-    }
-function ChangeHostname(){
-    $vm = Select-VM
-    $hostname = $vm.Name + "-WorkEnv"
-    Invoke-VMScript -ScriptType Powershell -Verbose -ScriptText "Rename-Computer -NewName $hostname -Force -Restart" -VM $vm -GuestCredential (Get-Credential)
-    }
-
-function DNSRecord(){
-    $vm = Get-VM -Name 'David-AD'
-    $zoneName = "capstone.local"
-    $recordName = $vm.guest.Hostname + "WorkEnv"
-    $ip = $vm.guest.IPAddress[0]
-    Invoke-VMScript -ScriptText "Add-DnsServerResourceRecordA -Name $recordName -ZoneName $zonename -AllowUpdateAny -IPv4Address $ip" -VM $vm -GuestCredential (Get-Credential) 
-}
-
+# create the Custom User Desktop Env.
 
 function CreateScript([string] $csv_path) {
     #$newVM = Select-VM
@@ -258,21 +166,17 @@ function CreateScript([string] $csv_path) {
 
        try {
                 
-            if ($narrator -eq "yes") {
-                
+            if ($narrator -eq "yes") {                
                 $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/narrator.ps1' -Raw
                 Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
                 Write-Host -ForegroundColor Green "Narrator enabled"
             }
-        
             if ($magnifier -eq "yes") {
-
                 $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/magnifier.ps1' -Raw
                 Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
                 Write-Host -ForegroundColor Green "Magnifier enabled"
             }
             if ($larger -eq "yes") {
-                #tenforums.com/tutorials/5990-change-text-size-windows-10-a.html
                 $script = Get-Content -Path 'AccessibilityAutomation/Capstone-Utils/scaling.ps1' -Raw
                 Invoke-VMScript -VM $newVM -ScriptText $script -GuestUser $credUser -GuestPassword $credPass
                 Write-Host -ForegroundColor Green "Display Scaling increased"
@@ -340,11 +244,10 @@ function CreateScript([string] $csv_path) {
             Write-Host -ForegroundColor Red "Error creating configuration"
             write-host $_.Exception.Message
         } 
-
     } 
 }
 
-
+# Function To Select CSVs
 function SelectCsv(){
     $files = Get-ChildItem '/home/david/Documents/AccessibilityAutomation/Capstone-Utils/CSVs' -Filter *.csv
 
@@ -360,9 +263,10 @@ function SelectCsv(){
         return $selectedFile.FullName -as [string]
     } else {
         Write-Host "Invalid selection. Please enter a valid index."
-}
+  }
 }
 
+# Function to create post-provisioning Report
 function create_report([string] $csv_path) {
     $Report = @()
     $file = Get-Content -Path $csv_path
@@ -375,53 +279,45 @@ function create_report([string] $csv_path) {
         $filename = "$fn-$ln"
         $settingsNames = @("Narrator", "Magnifier", "Scaled Display", "On-Screen Keyboard", "Dark Mode", "Visual Audio Alerts")
         $comment = $individuals[-1]
-
         $requestedSettings = @()
         $appliedSettings = @()
-
         for ($i = 2; $i -le 7; $i++) {
             if ($individuals[$i] -eq "yes") {
                 $requestedSettings += "- $($settingsNames[$i - 2])"
                 $appliedSettings += "- $($settingsNames[$i - 2]) : $($individuals[$i])"
             }
         }
-
         for ($i = 8; $i -le 16; $i++) {
             if ($individuals[$i] -eq "yes") {
                 $requestedSettings += "- $($settingsNames[$i - 1])"
                 $appliedSettings += "- $($settingsNames[$i - 1]) : $($individuals[$i])"
             }
         }
-
-        # Define a list of known languages
         $knownLanguages = @("English", "Spanish", "French", "German", "Chinese (Simplified)", "Chinese (Traditional)", "Japanese", "Korean", "Russian")
-
-        # Filter out languages that are not in the known languages list
         $enabledLanguages = $individuals[8..16] | Where-Object { $_ -in $knownLanguages }
-
         $reportContent = @"
 Accessibility Report for $fn $ln
 -----------------------------------
 Requested Settings:
-------------------
+-----------------------------------
 $($requestedSettings -join "`n")
 
 Applied Settings:
------------------
+-----------------------------------
 $($appliedSettings -join "`n")
 
 Languages Enabled:
-----------
+-----------------------------------
 $($enabledLanguages -join "`n")
 
 Additional Comments/Needs:
--------------------
+-----------------------------------
 $comment
 
 -----------------------------------
 EOF
-"@
 
+"@
         try {
             $path = Join-Path -Path "AccessibilityAutomation/Capstone-Utils/Reports" -ChildPath "$filename.txt"
             if (Test-Path (Split-Path $path -Parent) -PathType Container) {
@@ -442,6 +338,7 @@ EOF
     return $Report
 }
 
+# Function to check the CSV inventory
 function CheckInv(){
     #indexes all the CSV files in the CSVs directory and allows the user to select one to view
     $files = Get-ChildItem '/home/david/Documents/AccessibilityAutomation/Capstone-Utils/CSVs' -Filter *.csv
@@ -457,6 +354,7 @@ function CheckInv(){
     Write-Host $fileContent
 }
 
+# Function to check the Report inventory
 function CheckRep(){
     #indexes all the CSV files in the CSVs directory and allows the user to select one to view
     $files = Get-ChildItem '/home/david/Documents/AccessibilityAutomation/Capstone-Utils/Reports' -Filter *.txt
