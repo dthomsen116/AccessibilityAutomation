@@ -16,21 +16,18 @@ My goal with this project is to create an application that can be utilized durin
 
 Due to time limitations, there were features that I have not had time to add yet but would be easy to implement given slightly more time.
 
-- Right now the script uses the default deployer account. Originally I had intended to create a script to add a user to the domain and have the login be managed as the user, but due to the way that this was created, much of the script would need to be rewritten to include this.
-
-- Additionally A GUI (Graphical User Interface) was planned to house the runner file as well as a few extra features, but again due to time limitations, it has remained in its TUI format for submission.
-
+Please read the [Proof Of Concept](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Proof-Of-Concept-Warning) page for more information.
 However:
 
 I plan to continue work on this as a side project to tie up these loose ends after graduation and on my own time for personal gratification as I know that I am capable of these additions. 
 </div>
 
+<div align="center">
 
 ## Contact me
-
-| Sprint | Link |
-| --- | --- |
-| LinkedIn | [David Thomsen](https://www.linkedin.com/in/thomsendavid/)| 
-| Email | [david.thomsen@mymail.champlain.edu](mailto:david.thomsen@mymail.champlain.edu)| 
+| Sources | Links |
+|--|--|
+| My LinkedIn: | [![Linkedin](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/thomsendavid/) |
+| My Email: | [![Email](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:dthom.cap24@gmail.com) |
 
 </div>
