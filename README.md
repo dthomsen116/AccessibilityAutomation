@@ -10,6 +10,7 @@
 
 My goal with this project is to create an application that can be utilized during the onboarding process to allow all employees to customize a custom desktop designed for their accessibility. I am working with many different skills and tools that I have utilized throughout my [course history](https://github.com/dthomsen116#courseload) as my college years come to an end. By employing automation and empowering users to specify their accessibility preferences during desktop creation, I aim to contribute to a more inclusive digital workspace for the future of workplaces. 
 
+## Main Directory: [HERE](https://github.com/dthomsen116/AccessibilityAutomation/wiki)
 
 ## Proof Of Concept:
 
@@ -24,43 +25,6 @@ However:
 I plan to continue work on this as a side project to tie up these loose ends after graduation and on my own time for personal gratification as I know that I am capable of these additions. 
 </div>
 
-<div align="center">
-
-## Sprints
-| Sprint | Link |
-| --- | --- |
-| Sprint 1: Migration for HyperV| [Link for Sprint One](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Sprint-One) |
-| Speed Sprint 1.5: Migration to Vsphere | [Link for Sprint One and a Half (resolved multiple prior issues)](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Update-to-Sprint-One) |
-| Sprint 2: Form / Script Creation | [Link for Sprint Two](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Sprint-Two) |
-| Sprint 3: Invoking and Environment Rollout | [Link for Sprint Three](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Sprint-Three)|
-| Sprint 4: Fixing and Polish | [Link for Sprint Four](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Sprint-Four) |
-
-## Working Demo Links: 
-
-| Demo | Link |
-| --- | --- |
-| Early test run of the script | [Early Test Run here before script is being invoked](https://github.com/dthomsen116/AccessibilityAutomation/wiki/Test-Run-Through-Examples:) |
-| Runner File Working | [Working Demo Of Core Mechanics](https://drive.google.com/file/d/1687ZEoKB7iSaZYYIOQUcbo0O88SFbhLO/view?usp=sharing) |
-| Code Explaination | [Code Walkthrough](https://drive.google.com/file/d/1f8sPefUAdRWYDunTE_zzLiJdgm8X6e7x/view?usp=sharing) |
-| Addtional Features (Video soon) | [Post-Provisioning Report Example](https://github.com/dthomsen116/AccessibilityAutomation/assets/71229951/146b9dc8-dd3e-4695-8fd5-a87c5741e2a2), [TUI Examples](https://drive.google.com/file/d/1-xQ6J1UnvMvb1E0pHNPhIOtesmufyh8t/view?usp=sharing)
-| Update Video | [TUI and Additional Features](https://drive.google.com/file/d/1-xQ6J1UnvMvb1E0pHNPhIOtesmufyh8t/view?usp=sharing)
-
-## Other Links
-
-| Description | Link |
-| --- | --- |
-|First Capstone Project Idea |[Databasing and Digital Accessibility](https://github.com/dthomsen116/Capstone23-24) |
-|Automation Accessibility Wiki | [Wiki Link](https://github.com/dthomsen116/AccessibilityAutomation/wiki) |
-| Project Board | [Project Board Link](https://github.com/users/dthomsen116/projects/5/views/1)|
-| Mind Map | [Mind Map Link](https://github.com/dthomsen116/AccessibilityAutomation/blob/main/MindMap.pdf)|
-|Network Assignments | [Network Assignments Link](https://github.com/dthomsen116/AccessibilityAutomation/blob/main/Other/Assignment%20tracker.xlsx)
-
-## Sources
-
-| Sprint | Link |
-| --- | --- |
-| SYS-480 Automation Skills | (https://github.com/dthomsen116/SYS-480)| 
-|Sources Used Document|(https://github.com/dthomsen116/AccessibilityAutomation/blob/main/Other/Sources.md)|
 
 ## Contact me
 
