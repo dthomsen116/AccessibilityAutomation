@@ -5,6 +5,7 @@
 </div>
 
 
+# Final Report: [HERE](https://github.com/dthomsen116/AccessibilityAutomation/blob/main/Other/Thosmen_Capstone_Report.pdf)
 
 ## Mission Statement:
 
