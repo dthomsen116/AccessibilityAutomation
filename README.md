@@ -9,8 +9,8 @@
 
 ## Mission Statement:
 
-The primary objective of this project is to underscore the significance of integrating accessibility as a foundational element in workplace environments, rather than treating it as an afterthought. Through the implementation of this application, desktop environments are automatically constructed to ensure accessibility and functionality from creation. I utilized much of my previous expertise accumulated over years (detailed in course history), as well as picking up some new skills along the way to ensure the success of this project. By employing automation and empowering users to specify their accessibility preferences during desktop creation, I aim to contribute to a more inclusive 
-digital workspace for the future of workplaces. 
+In today's digitally connected world, ensuring accessibility is crucial, especially in workplace environments. This project aims to tackle this issue by developing an application that customizes desktop environments according to individual needs. By simplifying the onboarding process, this tool integrates accessibility seamlessly into workplace practices. Personalized configurations empower employees with tailored environments and promotes inclusivity by removing the stigma associated with requesting accommodations. Despite encountering challenges such as failed implementations and scope limitations, this proof of concept demonstrates technical feasibility and lays the groundwork for future development. In the end, the goal is to prioritize inclusivity in technology and contribute to a more accessible digital society.
+
 
 ## Use Case
 
