@@ -1,4 +1,0 @@
-proxmoxer
-requests
-paramiko
-openssh-wrapper
