@@ -1,11 +1,15 @@
 <div align="center">
 
+<Made by David Thomsen>
+  
 # Automating Accessibility Capstone Project
 
 </div>
 
 
 # Final Report: [HERE](https://github.com/dthomsen116/AccessibilityAutomation/blob/main/Other/Thomsen_Capstone_Report.pdf)
+
+<Made by David Thomsen>
 
 ## Mission Statement:
 
@@ -22,6 +26,8 @@ This tool is designed to streamline the onboarding process for new employees by 
 
 ## Main Directory: [HERE](https://github.com/dthomsen116/AccessibilityAutomation/wiki)
 
+<Made by David Thomsen>
+
 ## Proof Of Concept:
 
 Due to time limitations, there were features that I have not had time to add yet but would be easy to implement given slightly more time.
@@ -32,6 +38,8 @@ However:
 I plan to continue work on this as a side project to tie up these loose ends after graduation and on my own time for personal gratification as I know that I am capable of these additions. 
 </div>
 
+<Made by David Thomsen>
+
 <div align="center">
 
 ## Contact me
@@ -40,4 +48,5 @@ I plan to continue work on this as a side project to tie up these loose ends aft
 | My LinkedIn: | [![Linkedin](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/thomsendavid/) |
 | My Email: | [![Email](https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:dthom.cap24@gmail.com) |
 
+<Made by David Thomsen>
 </div>
